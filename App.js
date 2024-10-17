@@ -6,6 +6,7 @@ import Slider from "@react-native-community/slider";
 export default function YouTubePlayerComponent() {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
   const [duration, setDuration] = useState(0);
   const playerRef = useRef();
   const sliderRef = useRef();
@@ -25,9 +26,7 @@ export default function YouTubePlayerComponent() {
   }, []);
 
   const onProgress = useCallback((data) => {
-    if (!sliderRef.current.isSeeking()) {
-      setCurrentTime(data.currentTime);
-    }
+    setCurrentTime(data.currentTime);
   }, []);
 
   const seekTo = useCallback((value) => {
@@ -39,9 +38,7 @@ export default function YouTubePlayerComponent() {
     const interval = setInterval(() => {
       if (playing && playerRef.current) {
         playerRef.current.getCurrentTime().then((time) => {
-          if (!sliderRef.current.isSeeking()) {
-            setCurrentTime(time);
-          }
+          setCurrentTime(time);
         });
       }
     }, 1000);
