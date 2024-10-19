@@ -30,7 +30,10 @@ export default function YouTubePlayerComponent() {
   }, []);
 
   const onReady = useCallback(() => {
-    playerRef.current?.getDuration().then(setDuration);
+    playerRef.current?.getDuration().then((newDuration) => {
+      setDuration(newDuration);
+      console.log("New duration:", newDuration);
+    });
   }, []);
 
   const onProgress = useCallback((data) => {
@@ -42,21 +45,20 @@ export default function YouTubePlayerComponent() {
     setCurrentTime(value);
   }, []);
 
-  const nextSong = () => {
-    if (youtubeIds.indexOf(currSong) >= youtubeIds.length - 1) {
-      setCurrSong(youtubeIds[0]);
-    } else {
-      setCurrSong((currSong) => youtubeIds[youtubeIds.indexOf(currSong) + 1]);
-    }
-  };
+  const changeSong = useCallback(
+    (direction) => {
+      const currentIndex = youtubeIds.indexOf(currSong);
+      const newIndex =
+        (currentIndex + direction + youtubeIds.length) % youtubeIds.length;
+      setCurrSong(youtubeIds[newIndex]);
+      setCurrentTime(0);
+      setDuration(0); // Reset duration
+    },
+    [currSong]
+  );
 
-  const prevSong = useCallback(() => {
-    if (youtubeIds.indexOf(currSong) <= 0) {
-      setCurrSong(youtubeIds[youtubeIds.length - 1]);
-    } else {
-      setCurrSong((currSong) => youtubeIds[youtubeIds.indexOf(currSong) - 1]);
-    }
-  });
+  const nextSong = useCallback(() => changeSong(1), [changeSong]);
+  const prevSong = useCallback(() => changeSong(-1), [changeSong]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -69,6 +71,23 @@ export default function YouTubePlayerComponent() {
 
     return () => clearInterval(interval);
   }, [playing]);
+
+  useEffect(() => {
+    // This effect will run whenever currSong changes
+    setPlaying(false); // Pause the player
+    setCurrentTime(0); // Reset current time
+    setDuration(0); // Reset duration
+
+    // Wait for a short time to ensure the new video is loaded
+    const timer = setTimeout(() => {
+      playerRef.current?.getDuration().then((newDuration) => {
+        setDuration(newDuration);
+        console.log("Updated duration:", newDuration);
+      });
+    }, 400); // Adjust as needed
+
+    return () => clearTimeout(timer);
+  }, [currSong]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -98,13 +117,12 @@ export default function YouTubePlayerComponent() {
           value={currentTime}
           onSlidingComplete={seekTo}
         />
-
         <Text>
           {formatTime(currentTime)} / {formatTime(duration)}
         </Text>
         <View style={styles.nextSong}>
-          <Button title={"Prev Song"} onPress={prevSong} />
-          <Button title={"Next Song"} onPress={nextSong} />
+          <Button title="Prev Song" onPress={prevSong} />
+          <Button title="Next Song" onPress={nextSong} />
         </View>
       </View>
     </View>
