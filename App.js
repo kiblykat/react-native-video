@@ -3,10 +3,17 @@ import { View, Button, StyleSheet, Text } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Slider from "@react-native-community/slider";
 
+const youtubeIds = [
+  "K4ZSmMHOH6o",
+  "5JtVP_KrjhE",
+  "o_DpuiJq9bc",
+  "845By_LKvU8",
+  "eQOaZPnMmoE",
+];
+
 export default function YouTubePlayerComponent() {
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [isSeeking, setIsSeeking] = useState(false);
   const [duration, setDuration] = useState(0);
   const playerRef = useRef();
   const sliderRef = useRef();
@@ -56,10 +63,10 @@ export default function YouTubePlayerComponent() {
     <View style={styles.container}>
       <YoutubePlayer
         ref={playerRef}
-        height={300}
+        height={400}
         width={400}
         play={playing}
-        videoId={"K4ZSmMHOH6o"}
+        videoId={youtubeIds[1]}
         onChangeState={onStateChange}
         onReady={onReady}
         onProgress={onProgress}
