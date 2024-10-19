@@ -12,6 +12,7 @@ const youtubeIds = [
 ];
 
 export default function YouTubePlayerComponent() {
+  const [currSong, setCurrSong] = useState(youtubeIds[0]);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -41,6 +42,25 @@ export default function YouTubePlayerComponent() {
     setCurrentTime(value);
   }, []);
 
+  const nextSong = () => {
+    console.log("(next) currSong id is: " + youtubeIds.indexOf(currSong));
+    console.log("(next) total song length is: " + youtubeIds.length);
+    if (youtubeIds.indexOf(currSong) >= youtubeIds.length - 1) {
+      setCurrSong(youtubeIds[0]);
+    } else {
+      setCurrSong((currSong) => youtubeIds[youtubeIds.indexOf(currSong) + 1]);
+    }
+  };
+
+  const prevSong = useCallback(() => {
+    console.log("(prev) currSong id is: " + youtubeIds.indexOf(currSong));
+    if (youtubeIds.indexOf(currSong) <= 0) {
+      setCurrSong(youtubeIds[youtubeIds.length - 1]);
+    } else {
+      setCurrSong((currSong) => youtubeIds[youtubeIds.indexOf(currSong) - 1]);
+    }
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (playing && playerRef.current) {
@@ -66,7 +86,7 @@ export default function YouTubePlayerComponent() {
         height={400}
         width={400}
         play={playing}
-        videoId={youtubeIds[1]}
+        videoId={currSong}
         onChangeState={onStateChange}
         onReady={onReady}
         onProgress={onProgress}
@@ -81,9 +101,14 @@ export default function YouTubePlayerComponent() {
           value={currentTime}
           onSlidingComplete={seekTo}
         />
+
         <Text>
           {formatTime(currentTime)} / {formatTime(duration)}
         </Text>
+        <View style={styles.nextSong}>
+          <Button title={"Prev Song"} onPress={prevSong} />
+          <Button title={"Next Song"} onPress={nextSong} />
+        </View>
       </View>
     </View>
   );
@@ -102,5 +127,10 @@ const styles = StyleSheet.create({
   slider: {
     width: "100%",
     marginTop: 10,
+  },
+  nextSong: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
