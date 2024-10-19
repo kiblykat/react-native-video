@@ -43,8 +43,6 @@ export default function YouTubePlayerComponent() {
   }, []);
 
   const nextSong = () => {
-    console.log("(next) currSong id is: " + youtubeIds.indexOf(currSong));
-    console.log("(next) total song length is: " + youtubeIds.length);
     if (youtubeIds.indexOf(currSong) >= youtubeIds.length - 1) {
       setCurrSong(youtubeIds[0]);
     } else {
@@ -53,7 +51,6 @@ export default function YouTubePlayerComponent() {
   };
 
   const prevSong = useCallback(() => {
-    console.log("(prev) currSong id is: " + youtubeIds.indexOf(currSong));
     if (youtubeIds.indexOf(currSong) <= 0) {
       setCurrSong(youtubeIds[youtubeIds.length - 1]);
     } else {
