@@ -6,9 +6,9 @@ import Slider from "@react-native-community/slider";
 const youtubeIds = [
   "K4ZSmMHOH6o",
   "5JtVP_KrjhE",
-  "o_DpuiJq9bc",
-  "845By_LKvU8",
-  "eQOaZPnMmoE",
+  "NjXYmfF0I98",
+  "KgP31sOKhOw",
+  "ucOkoXWIZJE",
 ];
 
 export default function YouTubePlayerComponent() {
@@ -19,9 +19,10 @@ export default function YouTubePlayerComponent() {
   const playerRef = useRef();
   const sliderRef = useRef();
 
+  //when the current song ends, go to the next song
   const onStateChange = useCallback((state) => {
     if (state === "ended") {
-      setPlaying(false);
+      changeSong(1);
     }
   }, []);
 
@@ -60,6 +61,7 @@ export default function YouTubePlayerComponent() {
   const nextSong = useCallback(() => changeSong(1), [changeSong]);
   const prevSong = useCallback(() => changeSong(-1), [changeSong]);
 
+  //this updates the running time every 1000ms
   useEffect(() => {
     const interval = setInterval(() => {
       if (playing && playerRef.current) {
@@ -74,7 +76,6 @@ export default function YouTubePlayerComponent() {
 
   useEffect(() => {
     // This effect will run whenever currSong changes
-    setPlaying(false); // Pause the player
     setCurrentTime(0); // Reset current time
     setDuration(0); // Reset duration
 
@@ -82,10 +83,11 @@ export default function YouTubePlayerComponent() {
     const timer = setTimeout(() => {
       playerRef.current?.getDuration().then((newDuration) => {
         setDuration(newDuration);
-        console.log("Updated duration:", newDuration);
+        console.log("Updated duration:", newDuration); //issue here when ads are loaded instead
       });
-    }, 400); // Adjust as needed
+    }, 1500); // Adjust as needed
 
+    setPlaying(true);
     return () => clearTimeout(timer);
   }, [currSong]);
 
@@ -106,6 +108,7 @@ export default function YouTubePlayerComponent() {
         onChangeState={onStateChange}
         onReady={onReady}
         onProgress={onProgress}
+        forceAndroidAutoplay={true}
       />
       <View style={styles.controls}>
         <Button title={playing ? "Pause" : "Play"} onPress={togglePlaying} />
